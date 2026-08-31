@@ -252,9 +252,9 @@ export const LivePreview: React.FC<LivePreviewProps> = ({
         >
           {/* Viewport Frame */}
           <div 
-            className={`transition-all duration-300 ${
+            className={`transition-all duration-300 relative ${
               isMobileViewport 
-                ? 'w-[390px] sm:w-[410px] max-w-full my-3 bg-neutral-950 p-3 rounded-[50px] border-[8px] border-neutral-800 shadow-2xl relative' 
+                ? 'w-[400px] sm:w-[425px] max-w-full my-4 bg-neutral-950 p-3 sm:p-3.5 rounded-[52px] border-[8px] sm:border-[10px] border-neutral-800 shadow-2xl ring-1 ring-white/10 relative' 
                 : isTabletViewport 
                   ? 'w-[768px] max-w-full rounded-2xl shadow-2xl border border-neutral-800 overflow-hidden'
                   : 'w-full max-w-5xl rounded-2xl shadow-2xl border border-neutral-800 overflow-hidden'
@@ -279,9 +279,9 @@ export const LivePreview: React.FC<LivePreviewProps> = ({
 
             {/* Inner Interactive Website Mockup */}
             <div 
-              className={`transition-all duration-300 overflow-y-auto ${
+              className={`transition-all duration-300 overflow-y-auto relative ${
                 isMobileViewport 
-                  ? 'h-[640px] sm:h-[680px] rounded-b-[40px] rounded-t-[16px]' 
+                  ? 'h-[720px] sm:h-[780px] rounded-b-[40px] rounded-t-[16px]' 
                   : 'w-full min-h-[700px]'
               }`}
               style={{
@@ -919,6 +919,37 @@ export const LivePreview: React.FC<LivePreviewProps> = ({
                 </div>
               </footer>
 
+              {/* Live Toast Notification inside Smartphone Screen */}
+              {activeToast && isMobileViewport && (
+                <div 
+                  className="sticky bottom-6 mx-4 z-40 p-3.5 border flex items-center gap-3 shadow-2xl animate-fade-in"
+                  style={{
+                    backgroundColor: 'var(--theme-surface)',
+                    borderColor: 'var(--theme-border)',
+                    borderRadius: 'var(--theme-radius-card)',
+                    color: 'var(--theme-text)',
+                    boxShadow: 'var(--theme-shadow)',
+                  }}
+                >
+                  <div 
+                    className="w-7 h-7 rounded-full flex items-center justify-center shrink-0"
+                    style={{ backgroundColor: 'var(--theme-primary)', color: theme.isDark ? '#000' : '#fff' }}
+                  >
+                    <Bell className="w-3.5 h-3.5" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-xs font-bold truncate">Toast Notification Fired!</div>
+                    <div className="text-[10px] opacity-75 truncate">Theme motion & radius applied</div>
+                  </div>
+                  <button 
+                    onClick={() => setActiveToast(false)}
+                    className="opacity-50 hover:opacity-100 p-1"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              )}
+
               {/* Bottom Home Indicator for Smartphone View */}
               {isMobileViewport && (
                 <div className="pt-2 pb-3 flex justify-center bg-transparent">
@@ -929,10 +960,10 @@ export const LivePreview: React.FC<LivePreviewProps> = ({
           </div>
         </div>
 
-        {/* Live Floating Toast Notification */}
-        {activeToast && (
+        {/* Live Toast Notification for Desktop / Tablet (Anchored to Preview Canvas) */}
+        {activeToast && !isMobileViewport && (
           <div 
-            className="fixed bottom-6 right-6 z-50 p-4 border flex items-center gap-3 shadow-2xl animate-fade-in max-w-sm"
+            className="absolute bottom-6 right-6 z-50 p-4 border flex items-center gap-3 shadow-2xl animate-fade-in max-w-sm"
             style={{
               backgroundColor: 'var(--theme-surface)',
               borderColor: 'var(--theme-border)',
