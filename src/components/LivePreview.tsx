@@ -252,7 +252,7 @@ export const LivePreview: React.FC<LivePreviewProps> = ({
                     className="w-8 h-8 flex items-center justify-center font-black text-xs tracking-tighter shadow-sm group-hover:scale-105 transition-transform"
                     style={{
                       backgroundColor: 'var(--theme-primary)',
-                      color: theme.isDark ? '#000000' : '#ffffff',
+                      color: theme.isDark ? '#0A0B0E' : '#F8FAFC',
                       borderRadius: 'var(--theme-radius-card)',
                     }}
                   >
@@ -280,7 +280,7 @@ export const LivePreview: React.FC<LivePreviewProps> = ({
                     className="px-4 py-2 text-xs font-bold transition-all cursor-pointer hover:opacity-90 active:scale-95 shadow-sm"
                     style={{
                       backgroundColor: 'var(--theme-primary)',
-                      color: theme.isDark ? '#000000' : '#ffffff',
+                      color: theme.isDark ? '#0A0B0E' : '#F8FAFC',
                       borderRadius: 'var(--theme-radius-btn)',
                       boxShadow: 'var(--theme-shadow)',
                       border: `${theme.borderWidth}px solid var(--theme-primary)`,
@@ -368,7 +368,7 @@ export const LivePreview: React.FC<LivePreviewProps> = ({
                     className="px-6 py-3 text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer hover:opacity-90 active:scale-95 shadow-md"
                     style={{
                       backgroundColor: 'var(--theme-primary)',
-                      color: theme.isDark ? '#000000' : '#ffffff',
+                      color: theme.isDark ? '#0A0B0E' : '#F8FAFC',
                       borderRadius: 'var(--theme-radius-btn)',
                       boxShadow: 'var(--theme-shadow)',
                       border: `${theme.borderWidth}px solid var(--theme-primary)`,
@@ -565,7 +565,7 @@ export const LivePreview: React.FC<LivePreviewProps> = ({
                         className="absolute top-4 right-4 text-[10px] font-bold px-2.5 py-1"
                         style={{
                           backgroundColor: 'var(--theme-primary)',
-                          color: theme.isDark ? '#000' : '#fff',
+                          color: theme.isDark ? '#0A0B0E' : '#F8FAFC',
                           borderRadius: 'var(--theme-radius-btn)',
                         }}
                       >
@@ -588,7 +588,7 @@ export const LivePreview: React.FC<LivePreviewProps> = ({
                         className="w-full py-2.5 text-xs font-bold transition-all cursor-pointer hover:opacity-90 shadow-md"
                         style={{
                           backgroundColor: 'var(--theme-primary)',
-                          color: theme.isDark ? '#000' : '#fff',
+                          color: theme.isDark ? '#0A0B0E' : '#F8FAFC',
                           borderRadius: 'var(--theme-radius-btn)',
                         }}
                       >
@@ -642,7 +642,7 @@ export const LivePreview: React.FC<LivePreviewProps> = ({
                       className="px-6 py-2.5 text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer shrink-0 hover:opacity-90 shadow-sm"
                       style={{
                         backgroundColor: 'var(--theme-primary)',
-                        color: theme.isDark ? '#000000' : '#ffffff',
+                        color: theme.isDark ? '#0A0B0E' : '#F8FAFC',
                         borderRadius: 'var(--theme-radius-btn)',
                       }}
                     >
@@ -725,7 +725,7 @@ export const LivePreview: React.FC<LivePreviewProps> = ({
                           className="px-4 py-2 text-xs font-bold rounded-xl transition-all shadow-sm cursor-pointer disabled:opacity-50"
                           style={{
                             backgroundColor: isRateLimited ? '#ef4444' : 'var(--theme-primary)',
-                            color: theme.isDark ? '#000' : '#fff',
+                            color: theme.isDark ? '#0A0B0E' : '#F8FAFC',
                             borderRadius: 'var(--theme-radius-btn)',
                           }}
                         >
@@ -884,7 +884,7 @@ export const LivePreview: React.FC<LivePreviewProps> = ({
                 >
                   <div 
                     className="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
-                    style={{ backgroundColor: 'var(--theme-primary)', color: theme.isDark ? '#000' : '#fff' }}
+                    style={{ backgroundColor: 'var(--theme-primary)', color: theme.isDark ? '#0A0B0E' : '#F8FAFC' }}
                   >
                     <Bell className="w-4 h-4" />
                   </div>

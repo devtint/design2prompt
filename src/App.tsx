@@ -95,11 +95,11 @@ export const App: React.FC = () => {
       return {
         ...prev,
         isDark: willBeDark,
-        backgroundColor: willBeDark ? '#08090C' : '#FAF8F5',
-        surfaceColor: willBeDark ? '#121620' : '#FFFFFF',
-        textColor: willBeDark ? '#F8FAFC' : '#141311',
-        textMutedColor: willBeDark ? '#94A3B8' : '#78716C',
-        borderColor: willBeDark ? '#262D3D' : '#E5E0D8',
+        backgroundColor: willBeDark ? '#0A0B0F' : '#F9F8F6',
+        surfaceColor: willBeDark ? '#12141C' : '#EFEAE3',
+        textColor: willBeDark ? '#F1F5F9' : '#141518',
+        textMutedColor: willBeDark ? '#94A3B8' : '#757069',
+        borderColor: willBeDark ? '#232733' : '#DDD7CD',
       };
     });
   };
@@ -107,12 +107,12 @@ export const App: React.FC = () => {
   // Vibe Roll: Generate unexpected harmonious style combination
   const handleRandomizeVibe = () => {
     const palettes = [
-      { primary: '#EC4899', accent: '#8B5CF6', bg: '#0F0E17', surface: '#1F1B2E', text: '#FFFFFE', dark: true },
-      { primary: '#10B981', accent: '#06B6D4', bg: '#061412', surface: '#0E2824', text: '#ECFDF5', dark: true },
-      { primary: '#F59E0B', accent: '#EF4444', bg: '#FAF5EE', surface: '#FFFFFF', text: '#1C1917', dark: false },
-      { primary: '#6366F1', accent: '#38BDF8', bg: '#0B0F19', surface: '#151C2C', text: '#F8FAFC', dark: true },
-      { primary: '#14B8A6', accent: '#F97316', bg: '#F0FDFA', surface: '#FFFFFF', text: '#134E4A', dark: false },
-      { primary: '#D946EF', accent: '#06B6D4', bg: '#000000', surface: '#111111', text: '#FFFFFF', dark: true },
+      { primary: '#EC4899', accent: '#8B5CF6', bg: '#0E0D14', surface: '#1C1826', text: '#F4F2FA', dark: true },
+      { primary: '#10B981', accent: '#06B6D4', bg: '#071210', surface: '#0D221E', text: '#EBF7F2', dark: true },
+      { primary: '#F59E0B', accent: '#EF4444', bg: '#F8F5EE', surface: '#EFEAE0', text: '#1A1816', dark: false },
+      { primary: '#6366F1', accent: '#38BDF8', bg: '#0A0E17', surface: '#131926', text: '#F0F4F8', dark: true },
+      { primary: '#14B8A6', accent: '#F97316', bg: '#EFF8F6', surface: '#E3F0ED', text: '#123D3A', dark: false },
+      { primary: '#D946EF', accent: '#06B6D4', bg: '#090A0E', surface: '#13141B', text: '#EDEDED', dark: true },
     ];
     const chosenPalette = palettes[Math.floor(Math.random() * palettes.length)];
     const radii = [0, 4, 6, 8, 12, 16, 9999];
