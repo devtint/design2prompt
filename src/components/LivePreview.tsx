@@ -217,7 +217,7 @@ export const LivePreview: React.FC<LivePreviewProps> = ({
                 <span className="w-3 h-3 rounded-full bg-red-500/80" />
                 <span className="w-3 h-3 rounded-full bg-amber-500/80" />
                 <span className="w-3 h-3 rounded-full bg-emerald-500/80" />
-                <span className="ml-3 text-xs font-mono text-neutral-400 hidden sm:inline">https://nexus-architecture.local</span>
+                <span className="ml-3 text-xs font-mono text-neutral-400 hidden sm:inline">https://devtint.github.io/design2prompt</span>
               </div>
               <div className="text-[11px] font-mono text-neutral-500">
                 1440 × 900 • Desktop Preview
@@ -246,20 +246,20 @@ export const LivePreview: React.FC<LivePreviewProps> = ({
               >
                 <div 
                   onClick={() => flashHighlight('Navigation & Brand', 'foundation')}
-                  className="flex items-center gap-3 cursor-pointer group"
+                  className="flex items-center gap-2.5 cursor-pointer group"
                 >
                   <div 
-                    className="w-8 h-8 flex items-center justify-center font-bold text-sm shadow-sm group-hover:scale-105 transition-transform"
+                    className="w-8 h-8 flex items-center justify-center font-black text-xs tracking-tighter shadow-sm group-hover:scale-105 transition-transform"
                     style={{
                       backgroundColor: 'var(--theme-primary)',
                       color: theme.isDark ? '#000000' : '#ffffff',
                       borderRadius: 'var(--theme-radius-card)',
                     }}
                   >
-                    ▲
+                    dt
                   </div>
                   <span className="font-extrabold tracking-tight text-base" style={{ fontFamily: 'var(--theme-font-heading)' }}>
-                    Nexus<span style={{ color: 'var(--theme-primary)' }}>AI</span>
+                    dev<span style={{ color: 'var(--theme-primary)' }}>tint</span>
                   </span>
                 </div>
 
@@ -861,7 +861,7 @@ export const LivePreview: React.FC<LivePreviewProps> = ({
                 className="px-6 sm:px-10 py-8 border-t flex flex-wrap items-center justify-between gap-4 text-xs opacity-75"
                 style={{ borderColor: 'var(--theme-border)' }}
               >
-                <span>© 2026 Nexus Architecture. Powered by Design2Prompt.</span>
+                <span>© 2026 devtint. Powered by Design2Prompt.</span>
                 <div className="flex gap-6">
                   <span className="hover:underline cursor-pointer">Privacy</span>
                   <span className="hover:underline cursor-pointer">Terms</span>
