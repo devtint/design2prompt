@@ -28,11 +28,25 @@ export const App: React.FC = () => {
   const [theme, setTheme] = useState<ThemeConfig>(() => {
     // Check URL hash first
     const fromHash = decodeThemeFromHash(window.location.hash);
-    if (fromHash) return fromHash;
+    if (fromHash) {
+      return {
+        ...initialTheme,
+        ...fromHash,
+        security: { ...initialTheme.security, ...(fromHash.security || {}) },
+        backend: { ...initialTheme.backend, ...(fromHash.backend || {}) },
+      };
+    }
 
     // Check LocalStorage autosave
     const autosaved = getAutosavedTheme();
-    if (autosaved) return autosaved;
+    if (autosaved) {
+      return {
+        ...initialTheme,
+        ...autosaved,
+        security: { ...initialTheme.security, ...(autosaved.security || {}) },
+        backend: { ...initialTheme.backend, ...(autosaved.backend || {}) },
+      };
+    }
 
     return initialTheme;
   });

@@ -49,12 +49,28 @@ export const LivePreview: React.FC<LivePreviewProps> = ({
   const [pricingBilling, setPricingBilling] = useState<'monthly' | 'yearly'>('monthly');
   const [expandedFaq, setExpandedFaq] = useState<number | null>(0);
   const [highlightedElement, setHighlightedElement] = useState<string | null>(null);
+  const [rateLimitTokens, setRateLimitTokens] = useState<number>(5);
+  const [isRateLimited, setIsRateLimited] = useState<boolean>(false);
 
   const cssVars = getThemeCssVariables(theme) as React.CSSProperties;
 
   const triggerToast = () => {
     setActiveToast(true);
     setTimeout(() => setActiveToast(false), 3500);
+  };
+
+  const handleTestRateLimit = () => {
+    if (rateLimitTokens > 1) {
+      setRateLimitTokens(prev => prev - 1);
+    } else if (rateLimitTokens === 1) {
+      setRateLimitTokens(0);
+      setIsRateLimited(true);
+      triggerToast();
+      setTimeout(() => {
+        setRateLimitTokens(5);
+        setIsRateLimited(false);
+      }, 7000);
+    }
   };
 
   const handleTestValidation = () => {
@@ -747,6 +763,124 @@ export const LivePreview: React.FC<LivePreviewProps> = ({
                       )}
                     </div>
                   ))}
+                </div>
+              </section>
+
+              {/* Interactive Security, Database, Hosting & Rate Limiter Center */}
+              <section className="px-5 sm:px-8 pb-10">
+                <div 
+                  className="p-5 sm:p-6 border space-y-5 overflow-hidden"
+                  style={{
+                    backgroundColor: 'var(--theme-surface)',
+                    borderColor: 'var(--theme-border)',
+                    borderRadius: 'var(--theme-radius-card)',
+                  }}
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b pb-4" style={{ borderColor: 'var(--theme-border)' }}>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-emerald-400 font-bold text-xs bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 rounded-full">
+                          A+ SECURITY GRADE
+                        </span>
+                        <h3 className="font-bold text-sm sm:text-base" style={{ fontFamily: 'var(--theme-font-heading)' }}>
+                          Security & Architecture Matrix
+                        </h3>
+                      </div>
+                      <p className="text-xs opacity-75 mt-1">Live simulation of rate limits, headers, and database connectivity</p>
+                    </div>
+
+                    <div className="flex items-center gap-2 text-xs font-mono">
+                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                      <span className="opacity-80">SSL 256-bit TLS 1.3</span>
+                    </div>
+                  </div>
+
+                  {/* Rate Limiter Simulator Box */}
+                  <div 
+                    className="p-4 border rounded-xl space-y-3"
+                    style={{
+                      borderColor: isRateLimited ? '#ef4444' : 'var(--theme-border)',
+                      backgroundColor: isRateLimited ? 'rgba(239, 68, 68, 0.08)' : 'var(--theme-bg)',
+                    }}
+                  >
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                      <div>
+                        <div className="text-xs font-bold flex items-center gap-1.5">
+                          <span className={isRateLimited ? 'text-red-400' : 'text-sky-400'}>⚡ Rate Limiter Status:</span>
+                          <span className="font-mono">{isRateLimited ? 'BLOCKED (429 Too Many Requests)' : 'Active (Sliding Window)'}</span>
+                        </div>
+                        <div className="text-[11px] opacity-75 mt-0.5">
+                          Provider: <strong className="text-white">{theme.security.rateLimiting.provider}</strong> • Limit: {theme.security.rateLimiting.maxRequestsPerWindow} req / {theme.security.rateLimiting.windowSeconds}s
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-mono font-bold px-2 py-1 rounded bg-neutral-500/20">
+                          Tokens: {rateLimitTokens} / 5
+                        </span>
+                        <button
+                          onClick={handleTestRateLimit}
+                          disabled={isRateLimited}
+                          className="px-3 py-1.5 text-xs font-bold rounded-lg transition-all shadow-sm cursor-pointer disabled:opacity-50"
+                          style={{
+                            backgroundColor: isRateLimited ? '#ef4444' : 'var(--theme-primary)',
+                            color: theme.isDark ? '#000' : '#fff',
+                            borderRadius: 'var(--theme-radius-btn)',
+                          }}
+                        >
+                          {isRateLimited ? 'Rate Limit Exceeded!' : 'Spam Request'}
+                        </button>
+                        {isRateLimited && (
+                          <button
+                            onClick={() => {
+                              setRateLimitTokens(5);
+                              setIsRateLimited(false);
+                            }}
+                            className="px-2 py-1 text-[11px] border border-neutral-700 rounded hover:bg-neutral-800 text-neutral-300"
+                          >
+                            Reset
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Progress Quota Bar */}
+                    <div className="w-full h-1.5 bg-neutral-800 rounded-full overflow-hidden">
+                      <div 
+                        className={`h-full transition-all duration-300 ${
+                          isRateLimited ? 'bg-red-500 w-full animate-pulse' : 'bg-sky-400'
+                        }`}
+                        style={{ width: isRateLimited ? '100%' : `${(rateLimitTokens / 5) * 100}%` }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Architecture Badges Grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2.5 text-xs">
+                    <div className="p-3 border rounded-xl bg-neutral-500/5 space-y-1" style={{ borderColor: 'var(--theme-border)' }}>
+                      <div className="text-[10px] uppercase font-bold text-neutral-400">Authentication</div>
+                      <div className="font-semibold truncate">{theme.security.authStrategy}</div>
+                      <div className="text-[10px] text-emerald-400">✓ CSRF Protected</div>
+                    </div>
+
+                    <div className="p-3 border rounded-xl bg-neutral-500/5 space-y-1" style={{ borderColor: 'var(--theme-border)' }}>
+                      <div className="text-[10px] uppercase font-bold text-neutral-400">Database & ORM</div>
+                      <div className="font-semibold truncate">{theme.backend.database}</div>
+                      <div className="text-[10px] text-indigo-400">✓ {theme.backend.orm.toUpperCase()} Pooled</div>
+                    </div>
+
+                    <div className="p-3 border rounded-xl bg-neutral-500/5 space-y-1" style={{ borderColor: 'var(--theme-border)' }}>
+                      <div className="text-[10px] uppercase font-bold text-neutral-400">Validation & Sanitization</div>
+                      <div className="font-semibold truncate">{theme.security.inputValidation.toUpperCase()} Schema</div>
+                      <div className="text-[10px] text-emerald-400">✓ Strict Payload Check</div>
+                    </div>
+
+                    <div className="p-3 border rounded-xl bg-neutral-500/5 space-y-1" style={{ borderColor: 'var(--theme-border)' }}>
+                      <div className="text-[10px] uppercase font-bold text-neutral-400">Runtime & Hosting</div>
+                      <div className="font-semibold truncate">{theme.backend.runtime} on {theme.backend.hosting}</div>
+                      <div className="text-[10px] text-amber-400">✓ {theme.backend.apiStyle.toUpperCase()} API</div>
+                    </div>
+                  </div>
                 </div>
               </section>
 

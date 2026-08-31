@@ -1,3 +1,33 @@
+export interface SecurityConfig {
+  authStrategy: 'oauth-jwt' | 'session-cookies' | 'passkeys' | 'supabase-auth' | 'clerk-auth';
+  csrfProtection: boolean;
+  corsMode: 'strict-whitelist' | 'same-origin' | 'permissive';
+  contentSecurityPolicy: 'strict' | 'standard' | 'relaxed';
+  rateLimiting: {
+    enabled: boolean;
+    provider: 'upstash-redis' | 'in-memory' | 'cloudflare-workers';
+    maxRequestsPerWindow: number; // e.g. 60
+    windowSeconds: number; // e.g. 60
+    scope: 'ip-and-user' | 'ip-only' | 'route-specific';
+  };
+  headers: {
+    hsts: boolean;
+    noSniff: boolean;
+    frameOptions: 'DENY' | 'SAMEORIGIN';
+  };
+  inputValidation: 'zod' | 'valibot' | 'typebox';
+}
+
+export interface BackendConfig {
+  runtime: 'nodejs' | 'bun' | 'edge' | 'python-fastapi' | 'go';
+  apiStyle: 'rest' | 'trpc' | 'server-actions' | 'graphql';
+  database: 'postgresql-neon' | 'supabase' | 'planetscale-mysql' | 'turso-sqlite' | 'mongodb';
+  orm: 'drizzle' | 'prisma' | 'kysely' | 'raw-sql';
+  hosting: 'vercel' | 'cloudflare-pages' | 'aws' | 'fly-io' | 'railway' | 'docker';
+  caching: 'redis-upstash' | 'cdn-stale-while-revalidate' | 'none';
+  logging: 'pino' | 'sentry' | 'datadog' | 'console';
+}
+
 export interface ThemeConfig {
   id: string;
   name: string;
@@ -61,6 +91,10 @@ export interface ThemeConfig {
   // Motion
   motionSpeed: 'none' | 'snappy' | 'smooth' | 'leisurely';
   easing: 'ease-out' | 'spring' | 'linear';
+
+  // Architecture & Security Specs
+  security: SecurityConfig;
+  backend: BackendConfig;
 }
 
 export interface PresetTheme {

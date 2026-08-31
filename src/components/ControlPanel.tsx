@@ -9,10 +9,16 @@ import {
   CheckCircle2,
   AlertTriangle,
   Wand2,
-  Sliders,
-  Layers
+  ShieldCheck,
+  Database,
+  Gauge,
+  Lock,
+  Server,
+  Cloud,
+  Cpu,
+  KeyRound
 } from 'lucide-react';
-import { ThemeConfig } from '../types/theme';
+import { ThemeConfig, SecurityConfig, BackendConfig } from '../types/theme';
 import { getContrastRatio, getWcagRating, autoFixContrast } from '../utils/colorContrast';
 
 interface ControlPanelProps {
@@ -21,7 +27,9 @@ interface ControlPanelProps {
 }
 
 export const ControlPanel: React.FC<ControlPanelProps> = ({ theme, onChange }) => {
-  const [activeTab, setActiveTab] = useState<'foundation' | 'typography' | 'shape' | 'buttons' | 'cards' | 'motion'>('foundation');
+  const [activeTab, setActiveTab] = useState<
+    'foundation' | 'typography' | 'shape' | 'buttons' | 'cards' | 'motion' | 'security' | 'backend' | 'ratelimit'
+  >('foundation');
 
   // Contrast ratio
   const contrastRatio = getContrastRatio(theme.textColor, theme.backgroundColor);
@@ -30,6 +38,24 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ theme, onChange }) =
   const handleFixContrast = () => {
     const fixedColor = autoFixContrast(theme.textColor, theme.backgroundColor);
     onChange({ textColor: fixedColor });
+  };
+
+  const updateSecurity = (updated: Partial<SecurityConfig>) => {
+    onChange({
+      security: {
+        ...theme.security,
+        ...updated,
+      },
+    });
+  };
+
+  const updateBackend = (updated: Partial<BackendConfig>) => {
+    onChange({
+      backend: {
+        ...theme.backend,
+        ...updated,
+      },
+    });
   };
 
   const curatedPalettes = [
@@ -49,8 +75,14 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ theme, onChange }) =
     { id: 'shape', label: 'Shape & Radius', icon: Square },
     { id: 'buttons', label: 'Buttons', icon: MousePointerClick },
     { id: 'cards', label: 'Cards & Alerts', icon: LayoutTemplate },
+    { id: 'security', label: 'Security & Auth', icon: ShieldCheck },
+    { id: 'backend', label: 'DB & Backend', icon: Database },
+    { id: 'ratelimit', label: 'Rate Limiting', icon: Gauge },
     { id: 'motion', label: 'Motion', icon: Activity },
   ] as const;
+
+  const sec = theme.security;
+  const be = theme.backend;
 
   return (
     <aside className="w-full lg:w-96 xl:w-[420px] border-r border-neutral-800/80 bg-neutral-950 flex flex-col h-full lg:h-[calc(100vh-53px)] shrink-0 select-none">
@@ -61,7 +93,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ theme, onChange }) =
           <button
             key={id}
             onClick={() => setActiveTab(id)}
-            className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
               activeTab === id
                 ? 'bg-neutral-800 text-white shadow-sm border border-neutral-700/80'
                 : 'text-neutral-400 hover:text-neutral-200 hover:bg-neutral-850'
@@ -319,7 +351,6 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ theme, onChange }) =
         {/* ========================================================================= */}
         {activeTab === 'shape' && (
           <div className="space-y-6 animate-fade-in">
-            {/* Visual Corner Radius Picker */}
             <div>
               <div className="flex justify-between text-[11px] font-bold uppercase tracking-wider text-neutral-400 mb-2">
                 <span>Corner Curvature</span>
@@ -360,7 +391,6 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ theme, onChange }) =
               />
             </div>
 
-            {/* Border Style */}
             <div>
               <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-400 mb-2.5 block">
                 Borders & Frame Outline
@@ -388,7 +418,6 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ theme, onChange }) =
               </div>
             </div>
 
-            {/* Shadow Depth */}
             <div>
               <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-400 mb-2.5 block">
                 Elevation & Shadow
@@ -470,32 +499,6 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ theme, onChange }) =
                 ))}
               </div>
             </div>
-
-            <div>
-              <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-400 mb-2 block">
-                Interactive Hover Feel
-              </label>
-              <div className="grid grid-cols-2 gap-2">
-                {[
-                  { id: 'subtle', label: 'Subtle Shift' },
-                  { id: 'glowing', label: 'Glowing Ring' },
-                  { id: 'bouncy', label: 'Spring Scale' },
-                  { id: 'snap', label: 'Instant Snap' },
-                ].map((h) => (
-                  <button
-                    key={h.id}
-                    onClick={() => onChange({ buttonHover: h.id as any })}
-                    className={`p-2.5 text-xs font-semibold rounded-xl border text-left transition-all ${
-                      theme.buttonHover === h.id
-                        ? 'border-sky-500 bg-sky-500/15 text-white'
-                        : 'border-neutral-800 bg-neutral-900/60 text-neutral-400 hover:border-neutral-700'
-                    }`}
-                  >
-                    {h.label}
-                  </button>
-                ))}
-              </div>
-            </div>
           </div>
         )}
 
@@ -554,27 +557,285 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ theme, onChange }) =
                 ))}
               </div>
             </div>
+          </div>
+        )}
 
+        {/* ========================================================================= */}
+        {/* TAB 6: SECURITY & HARDENING (NEW!) */}
+        {/* ========================================================================= */}
+        {activeTab === 'security' && (
+          <div className="space-y-6 animate-fade-in">
+            {/* Auth Strategy */}
             <div>
-              <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-400 mb-2 block">
-                Status Badge Style
+              <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-400 mb-2 flex items-center gap-1.5">
+                <KeyRound className="w-3.5 h-3.5 text-sky-400" />
+                <span>Authentication Strategy</span>
+              </label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {[
+                  { id: 'session-cookies', label: 'HTTP-Only Cookies', sub: 'Most secure, CSRF protected' },
+                  { id: 'oauth-jwt', label: 'OAuth 2.0 + JWT', sub: 'Stateless bearer tokens' },
+                  { id: 'passkeys', label: 'Passkeys / WebAuthn', sub: 'Biometric passwordless' },
+                  { id: 'supabase-auth', label: 'Supabase Auth', sub: 'Built-in row-level security' },
+                  { id: 'clerk-auth', label: 'Clerk Platform', sub: 'Managed user management' },
+                ].map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={() => updateSecurity({ authStrategy: item.id as any })}
+                    className={`p-3 rounded-xl border text-left transition-all ${
+                      sec.authStrategy === item.id
+                        ? 'border-sky-500 bg-sky-500/15 text-white ring-1 ring-sky-500/30'
+                        : 'border-neutral-800 bg-neutral-900/60 text-neutral-400 hover:border-neutral-700'
+                    }`}
+                  >
+                    <div className="text-xs font-bold text-white">{item.label}</div>
+                    <div className="text-[10px] text-neutral-400">{item.sub}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Input Validation */}
+            <div>
+              <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-400 mb-2 flex items-center gap-1.5">
+                <Lock className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Input Validation Schema</span>
               </label>
               <div className="grid grid-cols-3 gap-2">
                 {[
-                  { id: 'pill-dot', label: 'Pill + Dot' },
-                  { id: 'solid-chip', label: 'Solid Chip' },
-                  { id: 'outline-tag', label: 'Outline' },
-                ].map((b) => (
+                  { id: 'zod', label: 'Zod (Recommended)' },
+                  { id: 'valibot', label: 'Valibot (Ultra-Light)' },
+                  { id: 'typebox', label: 'TypeBox' },
+                ].map((v) => (
                   <button
-                    key={b.id}
-                    onClick={() => onChange({ badgeStyle: b.id as any })}
-                    className={`py-2 text-xs font-semibold rounded-xl border transition-all ${
-                      theme.badgeStyle === b.id
+                    key={v.id}
+                    onClick={() => updateSecurity({ inputValidation: v.id as any })}
+                    className={`p-2.5 text-xs font-semibold rounded-xl border text-center transition-all ${
+                      sec.inputValidation === v.id
+                        ? 'border-emerald-500 bg-emerald-500/15 text-white'
+                        : 'border-neutral-800 bg-neutral-900/60 text-neutral-400 hover:border-neutral-700'
+                    }`}
+                  >
+                    {v.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Content Security Policy */}
+            <div>
+              <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-400 mb-2 block">
+                Content Security Policy (CSP)
+              </label>
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  { id: 'strict', label: 'Strict Nonce' },
+                  { id: 'standard', label: 'Standard CSP' },
+                  { id: 'relaxed', label: 'Relaxed' },
+                ].map((c) => (
+                  <button
+                    key={c.id}
+                    onClick={() => updateSecurity({ contentSecurityPolicy: c.id as any })}
+                    className={`py-2 text-xs font-semibold rounded-xl border text-center transition-all ${
+                      sec.contentSecurityPolicy === c.id
                         ? 'border-sky-500 bg-sky-500/15 text-white'
                         : 'border-neutral-800 bg-neutral-900/60 text-neutral-400 hover:border-neutral-700'
                     }`}
                   >
-                    {b.label}
+                    {c.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* HTTP Security Headers Toggles */}
+            <div className="space-y-2.5 pt-2">
+              <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-400 block">
+                HTTP Security Headers & Protection
+              </label>
+
+              <label className="flex items-center justify-between p-3 rounded-xl border border-neutral-800 bg-neutral-900/60 cursor-pointer">
+                <div>
+                  <div className="text-xs font-semibold text-white">Strict-Transport-Security (HSTS)</div>
+                  <div className="text-[10px] text-neutral-400">Enforces HTTPS with preload directive</div>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={sec.headers.hsts}
+                  onChange={(e) => updateSecurity({ headers: { ...sec.headers, hsts: e.target.checked } })}
+                  className="w-4 h-4 accent-sky-500 rounded cursor-pointer"
+                />
+              </label>
+
+              <label className="flex items-center justify-between p-3 rounded-xl border border-neutral-800 bg-neutral-900/60 cursor-pointer">
+                <div>
+                  <div className="text-xs font-semibold text-white">CSRF Defense Tokens</div>
+                  <div className="text-[10px] text-neutral-400">Verifies origin & SameSite tokens on mutations</div>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={sec.csrfProtection}
+                  onChange={(e) => updateSecurity({ csrfProtection: e.target.checked })}
+                  className="w-4 h-4 accent-sky-500 rounded cursor-pointer"
+                />
+              </label>
+
+              <label className="flex items-center justify-between p-3 rounded-xl border border-neutral-800 bg-neutral-900/60 cursor-pointer">
+                <div>
+                  <div className="text-xs font-semibold text-white">Clickjacking Defense</div>
+                  <div className="text-[10px] text-neutral-400">X-Frame-Options: {sec.headers.frameOptions}</div>
+                </div>
+                <select
+                  value={sec.headers.frameOptions}
+                  onChange={(e) => updateSecurity({ headers: { ...sec.headers, frameOptions: e.target.value as any } })}
+                  className="bg-neutral-800 text-xs border border-neutral-700 rounded-lg px-2 py-1 text-white"
+                >
+                  <option value="DENY">DENY (Block all frames)</option>
+                  <option value="SAMEORIGIN">SAMEORIGIN</option>
+                </select>
+              </label>
+            </div>
+          </div>
+        )}
+
+        {/* ========================================================================= */}
+        {/* TAB 7: DATABASE & BACKEND (NEW!) */}
+        {/* ========================================================================= */}
+        {activeTab === 'backend' && (
+          <div className="space-y-6 animate-fade-in">
+            {/* Database Engine */}
+            <div>
+              <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-400 mb-2 flex items-center gap-1.5">
+                <Database className="w-3.5 h-3.5 text-indigo-400" />
+                <span>Database Engine</span>
+              </label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {[
+                  { id: 'postgresql-neon', label: 'Neon Serverless Postgres', sub: 'Branching & pooling' },
+                  { id: 'supabase', label: 'Supabase Postgres', sub: 'Postgres + Auth + Storage' },
+                  { id: 'planetscale-mysql', label: 'PlanetScale MySQL', sub: 'Global scale MySQL' },
+                  { id: 'turso-sqlite', label: 'Turso (libSQL/SQLite)', sub: 'Ultra-fast Edge SQLite' },
+                  { id: 'mongodb', label: 'MongoDB Atlas', sub: 'Flexible document store' },
+                ].map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={() => updateBackend({ database: item.id as any })}
+                    className={`p-3 rounded-xl border text-left transition-all ${
+                      be.database === item.id
+                        ? 'border-indigo-500 bg-indigo-500/15 text-white ring-1 ring-indigo-500/30'
+                        : 'border-neutral-800 bg-neutral-900/60 text-neutral-400 hover:border-neutral-700'
+                    }`}
+                  >
+                    <div className="text-xs font-bold text-white">{item.label}</div>
+                    <div className="text-[10px] text-neutral-400">{item.sub}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* ORM & Data Layer */}
+            <div>
+              <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-400 mb-2 block">
+                ORM / Query Builder
+              </label>
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { id: 'drizzle', label: 'Drizzle ORM', sub: 'Zero overhead, type-safe' },
+                  { id: 'prisma', label: 'Prisma ORM', sub: 'Schema-first ecosystem' },
+                  { id: 'kysely', label: 'Kysely', sub: 'Type-safe SQL builder' },
+                  { id: 'raw-sql', label: 'Parameterized SQL', sub: 'Manual query control' },
+                ].map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={() => updateBackend({ orm: item.id as any })}
+                    className={`p-2.5 rounded-xl border text-left transition-all ${
+                      be.orm === item.id
+                        ? 'border-sky-500 bg-sky-500/15 text-white'
+                        : 'border-neutral-800 bg-neutral-900/60 text-neutral-400 hover:border-neutral-700'
+                    }`}
+                  >
+                    <div className="text-xs font-semibold text-white">{item.label}</div>
+                    <div className="text-[10px] text-neutral-400">{item.sub}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Backend Runtime & API */}
+            <div>
+              <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-400 mb-2 flex items-center gap-1.5">
+                <Cpu className="w-3.5 h-3.5 text-sky-400" />
+                <span>Backend Runtime & API Architecture</span>
+              </label>
+              <div className="grid grid-cols-2 gap-2 mb-2">
+                {[
+                  { id: 'nodejs', label: 'Node.js LTS' },
+                  { id: 'bun', label: 'Bun Runtime' },
+                  { id: 'edge', label: 'Edge Worker (V8)' },
+                  { id: 'python-fastapi', label: 'Python (FastAPI)' },
+                  { id: 'go', label: 'Go (Golang)' },
+                ].map((r) => (
+                  <button
+                    key={r.id}
+                    onClick={() => updateBackend({ runtime: r.id as any })}
+                    className={`p-2 text-xs font-semibold rounded-xl border text-center transition-all ${
+                      be.runtime === r.id
+                        ? 'border-sky-500 bg-sky-500/15 text-white'
+                        : 'border-neutral-800 bg-neutral-900/60 text-neutral-400 hover:border-neutral-700'
+                    }`}
+                  >
+                    {r.label}
+                  </button>
+                ))}
+              </div>
+
+              <div className="grid grid-cols-4 gap-1.5">
+                {[
+                  { id: 'rest', label: 'REST API' },
+                  { id: 'trpc', label: 'tRPC' },
+                  { id: 'server-actions', label: 'Actions' },
+                  { id: 'graphql', label: 'GraphQL' },
+                ].map((a) => (
+                  <button
+                    key={a.id}
+                    onClick={() => updateBackend({ apiStyle: a.id as any })}
+                    className={`py-1.5 text-[11px] font-mono rounded-lg border text-center transition-all ${
+                      be.apiStyle === a.id
+                        ? 'border-sky-500 bg-sky-500/20 text-white font-bold'
+                        : 'border-neutral-800 bg-neutral-900 text-neutral-400 hover:border-neutral-700'
+                    }`}
+                  >
+                    {a.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Hosting Platform */}
+            <div>
+              <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-400 mb-2 flex items-center gap-1.5">
+                <Cloud className="w-3.5 h-3.5 text-amber-400" />
+                <span>Hosting & Deployment Platform</span>
+              </label>
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  { id: 'vercel', label: 'Vercel' },
+                  { id: 'cloudflare-pages', label: 'Cloudflare' },
+                  { id: 'railway', label: 'Railway' },
+                  { id: 'fly-io', label: 'Fly.io' },
+                  { id: 'aws', label: 'AWS' },
+                  { id: 'docker', label: 'Docker' },
+                ].map((h) => (
+                  <button
+                    key={h.id}
+                    onClick={() => updateBackend({ hosting: h.id as any })}
+                    className={`py-2 text-xs font-semibold rounded-xl border text-center transition-all ${
+                      be.hosting === h.id
+                        ? 'border-amber-500 bg-amber-500/15 text-white'
+                        : 'border-neutral-800 bg-neutral-900/60 text-neutral-400 hover:border-neutral-700'
+                    }`}
+                  >
+                    {h.label}
                   </button>
                 ))}
               </div>
@@ -583,7 +844,126 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ theme, onChange }) =
         )}
 
         {/* ========================================================================= */}
-        {/* TAB 6: MOTION */}
+        {/* TAB 8: RATE LIMITING & ABUSE (NEW!) */}
+        {/* ========================================================================= */}
+        {activeTab === 'ratelimit' && (
+          <div className="space-y-6 animate-fade-in">
+            {/* Enable Toggle */}
+            <label className="flex items-center justify-between p-3.5 rounded-xl border border-neutral-800 bg-neutral-900/60 cursor-pointer">
+              <div>
+                <div className="text-xs font-bold text-white">Enable API Rate Limiting</div>
+                <div className="text-[10px] text-neutral-400">Protects against DDoS, brute-force & credential stuffing</div>
+              </div>
+              <input
+                type="checkbox"
+                checked={sec.rateLimiting.enabled}
+                onChange={(e) => updateSecurity({
+                  rateLimiting: { ...sec.rateLimiting, enabled: e.target.checked },
+                })}
+                className="w-4 h-4 accent-sky-500 rounded cursor-pointer"
+              />
+            </label>
+
+            {/* Provider */}
+            <div>
+              <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-400 mb-2 block">
+                Rate Limiter Provider
+              </label>
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  { id: 'upstash-redis', label: 'Upstash Redis', sub: 'Serverless Edge' },
+                  { id: 'cloudflare-workers', label: 'Cloudflare', sub: 'Edge network' },
+                  { id: 'in-memory', label: 'In-Memory', sub: 'Single instance' },
+                ].map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={() => updateSecurity({
+                      rateLimiting: { ...sec.rateLimiting, provider: item.id as any },
+                    })}
+                    className={`p-2.5 rounded-xl border text-left transition-all ${
+                      sec.rateLimiting.provider === item.id
+                        ? 'border-sky-500 bg-sky-500/15 text-white ring-1 ring-sky-500/30'
+                        : 'border-neutral-800 bg-neutral-900/60 text-neutral-400 hover:border-neutral-700'
+                    }`}
+                  >
+                    <div className="text-xs font-bold text-white">{item.label}</div>
+                    <div className="text-[10px] text-neutral-400">{item.sub}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Sliders: Max Requests & Window */}
+            <div className="space-y-4 p-4 border border-neutral-800 rounded-xl bg-neutral-900/40">
+              <div>
+                <div className="flex justify-between text-xs font-bold mb-1.5">
+                  <span className="text-neutral-300">Max Requests Allowed</span>
+                  <span className="text-sky-400 font-mono">{sec.rateLimiting.maxRequestsPerWindow} req</span>
+                </div>
+                <input
+                  type="range"
+                  min="10"
+                  max="200"
+                  step="10"
+                  value={sec.rateLimiting.maxRequestsPerWindow}
+                  onChange={(e) => updateSecurity({
+                    rateLimiting: { ...sec.rateLimiting, maxRequestsPerWindow: Number(e.target.value) },
+                  })}
+                  className="w-full accent-sky-500 h-2 bg-neutral-800 rounded-lg cursor-pointer"
+                />
+              </div>
+
+              <div>
+                <div className="flex justify-between text-xs font-bold mb-1.5">
+                  <span className="text-neutral-300">Time Window (Seconds)</span>
+                  <span className="text-sky-400 font-mono">{sec.rateLimiting.windowSeconds}s</span>
+                </div>
+                <input
+                  type="range"
+                  min="10"
+                  max="300"
+                  step="10"
+                  value={sec.rateLimiting.windowSeconds}
+                  onChange={(e) => updateSecurity({
+                    rateLimiting: { ...sec.rateLimiting, windowSeconds: Number(e.target.value) },
+                  })}
+                  className="w-full accent-sky-500 h-2 bg-neutral-800 rounded-lg cursor-pointer"
+                />
+              </div>
+            </div>
+
+            {/* Scope */}
+            <div>
+              <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-400 mb-2 block">
+                Limiter Scope
+              </label>
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  { id: 'ip-and-user', label: 'IP + User ID' },
+                  { id: 'ip-only', label: 'IP Address' },
+                  { id: 'route-specific', label: 'Per Route' },
+                ].map((s) => (
+                  <button
+                    key={s.id}
+                    onClick={() => updateSecurity({
+                      rateLimiting: { ...sec.rateLimiting, scope: s.id as any },
+                    })}
+                    className={`py-2 text-xs font-semibold rounded-xl border text-center transition-all ${
+                      sec.rateLimiting.scope === s.id
+                        ? 'border-sky-500 bg-sky-500/15 text-white'
+                        : 'border-neutral-800 bg-neutral-900/60 text-neutral-400 hover:border-neutral-700'
+                    }`}
+                  >
+                    {s.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ========================================================================= */}
+        {/* TAB 9: MOTION */}
         {/* ========================================================================= */}
         {activeTab === 'motion' && (
           <div className="space-y-6 animate-fade-in">
@@ -609,31 +989,6 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ theme, onChange }) =
                   >
                     <div className="text-xs font-semibold text-white">{m.label}</div>
                     <div className="text-[10px] text-neutral-400">{m.sub}</div>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-400 mb-2 block">
-                Easing Dynamics
-              </label>
-              <div className="grid grid-cols-3 gap-2">
-                {[
-                  { id: 'ease-out', label: 'Ease Out' },
-                  { id: 'spring', label: 'Springy' },
-                  { id: 'linear', label: 'Linear' },
-                ].map((e) => (
-                  <button
-                    key={e.id}
-                    onClick={() => onChange({ easing: e.id as any })}
-                    className={`py-2 text-xs font-semibold rounded-xl border transition-all ${
-                      theme.easing === e.id
-                        ? 'border-sky-500 bg-sky-500/15 text-white'
-                        : 'border-neutral-800 bg-neutral-900/60 text-neutral-400 hover:border-neutral-700'
-                    }`}
-                  >
-                    {e.label}
                   </button>
                 ))}
               </div>

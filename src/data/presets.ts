@@ -1,6 +1,43 @@
-import { PresetTheme } from '../types/theme';
+import { PresetTheme, SecurityConfig, BackendConfig } from '../types/theme';
 
-export const PRESET_THEMES: PresetTheme[] = [
+export const DEFAULT_SECURITY: SecurityConfig = {
+  authStrategy: 'session-cookies',
+  csrfProtection: true,
+  corsMode: 'strict-whitelist',
+  contentSecurityPolicy: 'strict',
+  rateLimiting: {
+    enabled: true,
+    provider: 'upstash-redis',
+    maxRequestsPerWindow: 60,
+    windowSeconds: 60,
+    scope: 'ip-and-user',
+  },
+  headers: {
+    hsts: true,
+    noSniff: true,
+    frameOptions: 'DENY',
+  },
+  inputValidation: 'zod',
+};
+
+export const DEFAULT_BACKEND: BackendConfig = {
+  runtime: 'nodejs',
+  apiStyle: 'rest',
+  database: 'postgresql-neon',
+  orm: 'drizzle',
+  hosting: 'vercel',
+  caching: 'cdn-stale-while-revalidate',
+  logging: 'pino',
+};
+
+const RAW_PRESETS: Array<{
+  id: string;
+  name: string;
+  category: 'Frontier AI & Tech' | 'Lifestyle & Product';
+  tagline: string;
+  description: string;
+  theme: any;
+}> = [
   // Tier A: Frontier AI & Tech
   {
     id: 'claude',
@@ -701,3 +738,39 @@ export const PRESET_THEMES: PresetTheme[] = [
     },
   },
 ];
+
+export const PRESET_THEMES: PresetTheme[] = RAW_PRESETS.map((preset) => {
+  let securityOverride: Partial<SecurityConfig> = {};
+  let backendOverride: Partial<BackendConfig> = {};
+
+  if (preset.id === 'supabase') {
+    securityOverride = { authStrategy: 'supabase-auth' };
+    backendOverride = { database: 'supabase', orm: 'drizzle' };
+  } else if (preset.id === 'antigravity') {
+    securityOverride = { authStrategy: 'oauth-jwt', corsMode: 'strict-whitelist' };
+    backendOverride = { runtime: 'edge', apiStyle: 'trpc', caching: 'redis-upstash' };
+  } else if (preset.id === 'vercel') {
+    backendOverride = { runtime: 'edge', apiStyle: 'server-actions', hosting: 'vercel' };
+  } else if (preset.id === 'claude') {
+    securityOverride = { authStrategy: 'session-cookies', contentSecurityPolicy: 'strict' };
+    backendOverride = { database: 'postgresql-neon', orm: 'drizzle' };
+  } else if (preset.id === 'cad-blueprint') {
+    backendOverride = { runtime: 'go', orm: 'raw-sql' };
+  }
+
+  return {
+    ...preset,
+    theme: {
+      ...preset.theme,
+      security: {
+        ...DEFAULT_SECURITY,
+        ...securityOverride,
+      },
+      backend: {
+        ...DEFAULT_BACKEND,
+        ...backendOverride,
+      },
+    },
+  };
+});
+
