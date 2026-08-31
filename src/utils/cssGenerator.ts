@@ -30,6 +30,20 @@ export function getThemeCssVariables(theme: ThemeConfig): Record<string, string>
     theme.easing === 'linear' ? 'linear' :
     'cubic-bezier(0.16, 1, 0.3, 1)';
 
+  // CRITICAL FIX: Cards and containers must NOT use 9999px (pill) radius,
+  // otherwise content severely overflows and clips through the rounded card edges!
+  // Clamp card radius to a maximum of 20px, while buttons & badges can be 9999px full pills.
+  const cardRadius = theme.radius >= 9999 ? 16 : Math.min(theme.radius, 20);
+  const buttonRadius = theme.buttonShape === 'pill' ? 9999 : theme.buttonShape === 'sharp' ? 0 : theme.radius;
+
+  const lineHeight = 
+    theme.textDensity === 'compact' ? '1.35' :
+    theme.textDensity === 'airy' ? '1.75' : '1.5';
+
+  const letterSpacing = 
+    theme.letterSpacing === 'tight' ? '-0.025em' :
+    theme.letterSpacing === 'wide' ? '0.04em' : '0em';
+
   return {
     '--theme-primary': theme.primaryColor,
     '--theme-accent': theme.accentColor,
@@ -39,10 +53,14 @@ export function getThemeCssVariables(theme: ThemeConfig): Record<string, string>
     '--theme-text-muted': theme.textMutedColor,
     '--theme-border': theme.borderColor,
     '--theme-radius': `${theme.radius}px`,
+    '--theme-radius-card': `${cardRadius}px`,
+    '--theme-radius-btn': `${buttonRadius}px`,
     '--theme-border-width': `${theme.borderWidth}px`,
     '--theme-shadow': shadow,
     '--theme-font-heading': fontHeading,
     '--theme-font-body': fontBody,
+    '--theme-line-height': lineHeight,
+    '--theme-letter-spacing': letterSpacing,
     '--theme-transition': `${transitionDuration} ${transitionEase}`,
     '--theme-spacing-factor': theme.density === 'compact' ? '0.75' : theme.density === 'spacious' ? '1.25' : '1',
   };
@@ -58,6 +76,7 @@ export function generateCssSnippet(theme: ThemeConfig): string {
 }
 
 export function generateTailwindSnippet(theme: ThemeConfig): string {
+  const cardRadius = theme.radius >= 9999 ? 16 : Math.min(theme.radius, 20);
   return `/* Tailwind CSS v4 @theme or v3 config */
 @theme {
   --color-primary: ${theme.primaryColor};
@@ -68,6 +87,7 @@ export function generateTailwindSnippet(theme: ThemeConfig): string {
   --color-muted: ${theme.textMutedColor};
   --color-border: ${theme.borderColor};
   --radius-theme: ${theme.radius}px;
+  --radius-card: ${cardRadius}px;
 }
 
 /* Tailwind v3 tailwind.config.js snippet: */
@@ -82,6 +102,7 @@ module.exports = {
       },
       borderRadius: {
         theme: '${theme.radius}px',
+        card: '${cardRadius}px',
       }
     }
   }

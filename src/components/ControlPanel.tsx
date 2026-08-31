@@ -87,7 +87,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ theme, onChange }) =
                 <span>Curated Color Harmonies</span>
                 <span className="text-[10px] text-neutral-500 font-normal">Click to apply</span>
               </label>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {curatedPalettes.map((p) => (
                   <button
                     key={p.label}
@@ -98,9 +98,9 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ theme, onChange }) =
                       surfaceColor: p.surface,
                       textColor: p.text,
                     })}
-                    className="p-2.5 rounded-xl border border-neutral-800 hover:border-neutral-700 bg-neutral-900/60 hover:bg-neutral-850 transition-all text-left flex items-center justify-between group"
+                    className="p-2.5 rounded-xl border border-neutral-800 hover:border-neutral-700 bg-neutral-900/60 hover:bg-neutral-850 transition-all text-left flex items-center justify-between group overflow-hidden"
                   >
-                    <span className="text-xs font-medium text-neutral-300 group-hover:text-white truncate">
+                    <span className="text-xs font-medium text-neutral-300 group-hover:text-white truncate mr-2">
                       {p.label}
                     </span>
                     <div className="flex items-center -space-x-1 shrink-0">
@@ -326,7 +326,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ theme, onChange }) =
                 <span className="text-sky-400 font-mono">{theme.radius === 9999 ? 'Pill (Full)' : `${theme.radius}px`}</span>
               </div>
 
-              <div className="grid grid-cols-5 gap-1.5 mb-3">
+              <div className="grid grid-cols-5 gap-1 sm:gap-1.5 mb-3">
                 {[
                   { r: 0, label: '0px', shape: 'rounded-none' },
                   { r: 6, label: '6px', shape: 'rounded-md' },
@@ -337,14 +337,14 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ theme, onChange }) =
                   <button
                     key={item.r}
                     onClick={() => onChange({ radius: item.r })}
-                    className={`p-2 rounded-xl border text-center transition-all flex flex-col items-center gap-1.5 ${
+                    className={`p-1.5 sm:p-2 rounded-xl border text-center transition-all flex flex-col items-center gap-1 sm:gap-1.5 min-w-0 ${
                       theme.radius === item.r
                         ? 'border-sky-500 bg-sky-500/15 text-white ring-1 ring-sky-500/30'
                         : 'border-neutral-800 bg-neutral-900/60 text-neutral-400 hover:border-neutral-700'
                     }`}
                   >
-                    <div className={`w-5 h-5 border-2 border-current ${item.shape}`} />
-                    <span className="text-[10px] font-mono">{item.label}</span>
+                    <div className={`w-4 h-4 sm:w-5 sm:h-5 border-2 border-current ${item.shape}`} />
+                    <span className="text-[9px] sm:text-[10px] font-mono truncate">{item.label}</span>
                   </button>
                 ))}
               </div>

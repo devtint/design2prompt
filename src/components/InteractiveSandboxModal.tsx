@@ -19,49 +19,49 @@ export const InteractiveSandboxModal: React.FC<InteractiveSandboxModalProps> = (
   const cssVars = getThemeCssVariables(theme) as React.CSSProperties;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fade-in">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-fade-in">
       <div 
-        className="w-full max-w-md border shadow-2xl p-6 relative space-y-4"
+        className="w-full max-w-md border shadow-2xl p-5 sm:p-6 relative space-y-4 overflow-hidden"
         style={{
           ...cssVars,
           backgroundColor: 'var(--theme-surface)',
           borderColor: 'var(--theme-border)',
-          borderRadius: 'var(--theme-radius)',
+          borderRadius: 'var(--theme-radius-card)',
           color: 'var(--theme-text)',
           fontFamily: 'var(--theme-font-body)',
           boxShadow: 'var(--theme-shadow)',
         }}
       >
         {/* Modal Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2.5 min-w-0">
             <div 
-              className="w-6 h-6 rounded flex items-center justify-center text-xs"
+              className="w-6 h-6 rounded flex items-center justify-center text-xs shrink-0"
               style={{ backgroundColor: 'var(--theme-primary)', color: theme.isDark ? '#000' : '#fff' }}
             >
               ▲
             </div>
-            <h3 className="font-bold text-sm" style={{ fontFamily: 'var(--theme-font-heading)' }}>
+            <h3 className="font-bold text-sm truncate" style={{ fontFamily: 'var(--theme-font-heading)' }}>
               Modal Dialog Preview
             </h3>
           </div>
           <button 
             onClick={onClose}
-            className="p-1 rounded opacity-60 hover:opacity-100 transition-opacity"
+            className="p-1 rounded opacity-60 hover:opacity-100 transition-opacity shrink-0"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Modal Body */}
-        <div className="space-y-2 text-xs opacity-80 leading-relaxed">
+        <div className="space-y-2.5 text-xs opacity-85 leading-relaxed break-words">
           <p>
-            This modal illustrates your active theme's corner radius (<strong className="text-sky-400">{theme.radius}px</strong>), 
-            border style (<strong className="text-sky-400">{theme.borderStyle}</strong>), 
+            This dialog tests container corner curves (<strong className="text-sky-400 font-mono">{theme.radius}px</strong>), 
+            border outline (<strong className="text-sky-400">{theme.borderStyle}</strong>), 
             and button styling.
           </p>
           <div 
-            className="p-3 border rounded text-[11px] flex items-center gap-2"
+            className="p-3 border rounded-lg text-[11px] flex items-center gap-2.5"
             style={{
               borderColor: 'var(--theme-border)',
               backgroundColor: 'rgba(239, 68, 68, 0.08)',
@@ -69,7 +69,7 @@ export const InteractiveSandboxModal: React.FC<InteractiveSandboxModalProps> = (
             }}
           >
             <AlertTriangle className="w-4 h-4 shrink-0" />
-            <span>Danger action buttons inherit specific warning styles defined in settings.</span>
+            <span className="break-words leading-tight">Danger buttons inherit specific alert styles defined in settings.</span>
           </div>
         </div>
 
@@ -77,10 +77,10 @@ export const InteractiveSandboxModal: React.FC<InteractiveSandboxModalProps> = (
         <div className="pt-2 flex items-center justify-end gap-2 text-xs font-semibold">
           <button
             onClick={onClose}
-            className="px-3.5 py-2 border transition-all"
+            className="px-3.5 py-2 border transition-all cursor-pointer"
             style={{
               borderColor: 'var(--theme-border)',
-              borderRadius: 'var(--theme-radius)',
+              borderRadius: 'var(--theme-radius-btn)',
             }}
           >
             Cancel
@@ -88,11 +88,11 @@ export const InteractiveSandboxModal: React.FC<InteractiveSandboxModalProps> = (
 
           <button
             onClick={onClose}
-            className="px-4 py-2 transition-all flex items-center gap-1.5"
+            className="px-4 py-2 transition-all flex items-center gap-1.5 cursor-pointer"
             style={{
               backgroundColor: 'var(--theme-primary)',
               color: theme.isDark ? '#000000' : '#ffffff',
-              borderRadius: 'var(--theme-radius)',
+              borderRadius: 'var(--theme-radius-btn)',
             }}
           >
             <Check className="w-3.5 h-3.5" />
