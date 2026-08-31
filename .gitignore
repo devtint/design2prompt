@@ -4,3 +4,4 @@ dist
 *.local
 *.tsbuildinfo
 design-md-builder-spec.md
+sample-*.html
