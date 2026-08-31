@@ -14,6 +14,7 @@ import {
   getAutosavedTheme, 
   SavedTemplate 
 } from './utils/storage';
+import { Sliders, Eye, Sparkles } from 'lucide-react';
 
 export const App: React.FC = () => {
   // Default to Antigravity preset
@@ -40,6 +41,7 @@ export const App: React.FC = () => {
   const [isExportOpen, setIsExportOpen] = useState(false);
   const [isTemplatesOpen, setIsTemplatesOpen] = useState(false);
   const [isModalPreviewOpen, setIsModalPreviewOpen] = useState(false);
+  const [mobileTab, setMobileTab] = useState<'controls' | 'preview'>('controls');
 
   // Load saved templates on mount
   useEffect(() => {
@@ -79,11 +81,11 @@ export const App: React.FC = () => {
       return {
         ...prev,
         isDark: willBeDark,
-        backgroundColor: willBeDark ? '#0F1117' : '#FAF9F6',
-        surfaceColor: willBeDark ? '#1A1D27' : '#FFFFFF',
+        backgroundColor: willBeDark ? '#08090C' : '#FAF8F5',
+        surfaceColor: willBeDark ? '#121620' : '#FFFFFF',
         textColor: willBeDark ? '#F8FAFC' : '#141311',
-        textMutedColor: willBeDark ? '#94A3B8' : '#64748B',
-        borderColor: willBeDark ? '#2B3142' : '#E2E8F0',
+        textMutedColor: willBeDark ? '#94A3B8' : '#78716C',
+        borderColor: willBeDark ? '#262D3D' : '#E5E0D8',
       };
     });
   };
@@ -99,7 +101,7 @@ export const App: React.FC = () => {
       { primary: '#D946EF', accent: '#06B6D4', bg: '#000000', surface: '#111111', text: '#FFFFFF', dark: true },
     ];
     const chosenPalette = palettes[Math.floor(Math.random() * palettes.length)];
-    const radii = [0, 4, 8, 12, 16, 9999];
+    const radii = [0, 4, 6, 8, 12, 16, 9999];
     const randomRadius = radii[Math.floor(Math.random() * radii.length)];
     const headings = ['sans', 'serif', 'mono', 'display'] as const;
     const randomHeading = headings[Math.floor(Math.random() * headings.length)];
@@ -121,7 +123,7 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-950 flex flex-col font-sans">
+    <div className="min-h-screen bg-neutral-950 flex flex-col font-sans selection:bg-sky-500 selection:text-white">
       {/* Top Application Header */}
       <Header
         currentTheme={theme}
@@ -131,18 +133,63 @@ export const App: React.FC = () => {
         onOpenExport={() => setIsExportOpen(true)}
         onOpenTemplates={() => setIsTemplatesOpen(true)}
         savedTemplatesCount={savedTemplates.length}
+        mobileTab={mobileTab}
+        onSetMobileTab={setMobileTab}
       />
 
-      {/* Main Workspace: Left Controls + Right Live Preview */}
-      <main className="flex-1 flex flex-col lg:flex-row overflow-hidden">
-        <ControlPanel
-          theme={theme}
-          onChange={handleChangeTheme}
-        />
-        <LivePreview
-          theme={theme}
-          onOpenModalPreview={() => setIsModalPreviewOpen(true)}
-        />
+      {/* Main Responsive Workspace */}
+      <main className="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
+        
+        {/* Left Controls (Desktop always visible, Mobile shown if mobileTab === 'controls') */}
+        <div className={`w-full lg:w-auto ${mobileTab === 'controls' ? 'block' : 'hidden lg:block'}`}>
+          <ControlPanel
+            theme={theme}
+            onChange={handleChangeTheme}
+          />
+        </div>
+
+        {/* Right Live Preview (Desktop always visible, Mobile shown if mobileTab === 'preview') */}
+        <div className={`flex-1 ${mobileTab === 'preview' ? 'block' : 'hidden lg:block'}`}>
+          <LivePreview
+            theme={theme}
+            onOpenModalPreview={() => setIsModalPreviewOpen(true)}
+          />
+        </div>
+
+        {/* Floating Mobile Switcher Bar (Visible on mobile/tablet screens only) */}
+        <div className="lg:hidden fixed bottom-5 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 bg-neutral-900/90 backdrop-blur-xl border border-neutral-800 p-1.5 rounded-2xl shadow-2xl">
+          <button
+            onClick={() => setMobileTab('controls')}
+            className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+              mobileTab === 'controls'
+                ? 'bg-sky-500 text-white shadow-lg shadow-sky-500/25'
+                : 'text-neutral-400 hover:text-white'
+            }`}
+          >
+            <Sliders className="w-4 h-4" />
+            <span>Customize</span>
+          </button>
+
+          <button
+            onClick={() => setMobileTab('preview')}
+            className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+              mobileTab === 'preview'
+                ? 'bg-sky-500 text-white shadow-lg shadow-sky-500/25'
+                : 'text-neutral-400 hover:text-white'
+            }`}
+          >
+            <Eye className="w-4 h-4" />
+            <span>Live Preview</span>
+          </button>
+
+          <button
+            onClick={() => setIsExportOpen(true)}
+            title="Export Prompt"
+            className="p-2 rounded-xl bg-neutral-800 text-sky-400 border border-neutral-700"
+          >
+            <Sparkles className="w-4 h-4" />
+          </button>
+        </div>
       </main>
 
       {/* Export / AI Prompt Modal */}
