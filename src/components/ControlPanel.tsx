@@ -16,9 +16,12 @@ import {
   Server,
   Cloud,
   Cpu,
-  KeyRound
+  KeyRound,
+  CheckSquare,
+  Square as SquareIcon,
+  ShieldAlert
 } from 'lucide-react';
-import { ThemeConfig, SecurityConfig, BackendConfig } from '../types/theme';
+import { ThemeConfig, SecurityConfig, BackendConfig, AuthMethod, SecurityDefense } from '../types/theme';
 import { getContrastRatio, getWcagRating, autoFixContrast } from '../utils/colorContrast';
 
 interface ControlPanelProps {
@@ -561,45 +564,152 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ theme, onChange }) =
         )}
 
         {/* ========================================================================= */}
-        {/* TAB 6: SECURITY & HARDENING (NEW!) */}
+        {/* TAB 6: SECURITY & HARDENING (MULTI-SELECT DEFENSE-IN-DEPTH!) */}
         {/* ========================================================================= */}
         {activeTab === 'security' && (
           <div className="space-y-6 animate-fade-in">
-            {/* Auth Strategy */}
+            
+            {/* Multi-Select Authentication Methods */}
             <div>
-              <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-400 mb-2 flex items-center gap-1.5">
-                <KeyRound className="w-3.5 h-3.5 text-sky-400" />
-                <span>Authentication Strategy</span>
-              </label>
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-400 flex items-center gap-1.5">
+                  <KeyRound className="w-3.5 h-3.5 text-sky-400" />
+                  <span>Authentication Methods (Multi-Select)</span>
+                </label>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => updateSecurity({
+                      authMethods: ['session-cookies', 'oauth-jwt', 'passkeys', 'magic-link', 'totp-2fa']
+                    })}
+                    className="px-2 py-0.5 rounded text-[10px] font-semibold bg-neutral-800 hover:bg-neutral-700 text-neutral-300 transition-colors"
+                  >
+                    Select All
+                  </button>
+                  <button
+                    onClick={() => updateSecurity({
+                      authMethods: ['passkeys', 'magic-link']
+                    })}
+                    className="px-2 py-0.5 rounded text-[10px] font-semibold bg-neutral-800 hover:bg-neutral-700 text-neutral-300 transition-colors"
+                  >
+                    Passwordless
+                  </button>
+                </div>
+              </div>
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {[
-                  { id: 'session-cookies', label: 'HTTP-Only Cookies', sub: 'Most secure, CSRF protected' },
-                  { id: 'oauth-jwt', label: 'OAuth 2.0 + JWT', sub: 'Stateless bearer tokens' },
-                  { id: 'passkeys', label: 'Passkeys / WebAuthn', sub: 'Biometric passwordless' },
-                  { id: 'supabase-auth', label: 'Supabase Auth', sub: 'Built-in row-level security' },
-                  { id: 'clerk-auth', label: 'Clerk Platform', sub: 'Managed user management' },
-                ].map((item) => (
-                  <button
-                    key={item.id}
-                    onClick={() => updateSecurity({ authStrategy: item.id as any })}
-                    className={`p-3 rounded-xl border text-left transition-all ${
-                      sec.authStrategy === item.id
-                        ? 'border-sky-500 bg-sky-500/15 text-white ring-1 ring-sky-500/30'
-                        : 'border-neutral-800 bg-neutral-900/60 text-neutral-400 hover:border-neutral-700'
-                    }`}
-                  >
-                    <div className="text-xs font-bold text-white">{item.label}</div>
-                    <div className="text-[10px] text-neutral-400">{item.sub}</div>
-                  </button>
-                ))}
+                  { id: 'session-cookies', label: 'HTTP-Only Cookies', sub: 'Encrypted cookie sessions with CSRF shield' },
+                  { id: 'oauth-jwt', label: 'OAuth 2.0 (Social / SSO)', sub: 'Google, GitHub, Discord & Enterprise SAML' },
+                  { id: 'passkeys', label: 'Passkeys / WebAuthn', sub: 'Biometric TouchID / FaceID & hardware keys' },
+                  { id: 'magic-link', label: 'Magic Links (Email OTP)', sub: 'Frictionless passwordless email verification' },
+                  { id: 'totp-2fa', label: 'Authenticator 2FA (TOTP)', sub: 'Google Authenticator / 1Password 6-digit codes' },
+                  { id: 'supabase-auth', label: 'Supabase Auth', sub: 'Postgres row-level security policies (RLS)' },
+                  { id: 'clerk-auth', label: 'Clerk Platform', sub: 'Hosted multi-tenant user management' },
+                ].map((item) => {
+                  const active = (sec.authMethods || []).includes(item.id as AuthMethod);
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => {
+                        const current = sec.authMethods || [];
+                        const next = active 
+                          ? current.filter(m => m !== item.id) 
+                          : [...current, item.id as AuthMethod];
+                        updateSecurity({ authMethods: next.length ? next : [item.id as AuthMethod] });
+                      }}
+                      className={`p-3 rounded-xl border text-left transition-all flex items-start gap-2.5 ${
+                        active
+                          ? 'border-sky-500 bg-sky-500/15 text-white ring-1 ring-sky-500/30'
+                          : 'border-neutral-800 bg-neutral-900/60 text-neutral-400 hover:border-neutral-700'
+                      }`}
+                    >
+                      <div className="mt-0.5 shrink-0">
+                        {active ? <CheckSquare className="w-4 h-4 text-sky-400" /> : <SquareIcon className="w-4 h-4 text-neutral-600" />}
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-xs font-bold text-white">{item.label}</div>
+                        <div className="text-[10px] text-neutral-400 leading-snug mt-0.5">{item.sub}</div>
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
-            {/* Input Validation */}
+            {/* Defense-in-Depth Hardening Checklist (Multi-Select) */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-400 flex items-center gap-1.5">
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>Defense-in-Depth Layers (Multi-Select)</span>
+                </label>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => updateSecurity({
+                      defenses: [
+                        'csrf', 'hsts', 'csp', 'clickjacking', 'nosniff', 
+                        'cors-whitelist', 'zod-sanitization', 'parameterized-sql', 
+                        'env-validation', 'bot-protection', 'audit-logging'
+                      ],
+                      csrfProtection: true,
+                      headers: { ...sec.headers, hsts: true, noSniff: true, frameOptions: 'DENY' }
+                    })}
+                    className="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/30 transition-colors"
+                  >
+                    Harden All (A+ Grade)
+                  </button>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                {[
+                  { id: 'csrf', label: 'CSRF Defense Tokens', sub: 'Origin verification & anti-CSRF tokens on state-changing mutations' },
+                  { id: 'hsts', label: 'Strict-Transport-Security (HSTS)', sub: 'Forces HTTPS with max-age=31536000 and browser preload' },
+                  { id: 'csp', label: 'Content Security Policy (CSP Nonces)', sub: 'Cryptographic nonces to disallow malicious XSS script injection' },
+                  { id: 'clickjacking', label: 'Clickjacking Block (X-Frame-Options)', sub: 'Blocks embedding inside hidden iframes (DENY)' },
+                  { id: 'nosniff', label: 'MIME-Sniffing Prevention (nosniff)', sub: 'Prevents browsers from MIME-interpreting untyped uploads' },
+                  { id: 'cors-whitelist', label: 'CORS Strict Origin Whitelist', sub: 'Rejects unapproved third-party domains from querying private APIs' },
+                  { id: 'zod-sanitization', label: 'Zod Runtime Input Sanitization', sub: 'Strict schema parse on all request bodies, rejecting unknown keys' },
+                  { id: 'parameterized-sql', label: '100% Parameterized SQL Queries', sub: 'Strict ORM / driver parameter binding to make SQL injection mathematically impossible' },
+                  { id: 'env-validation', label: 'Runtime Secrets Schema Validation', sub: 'Validates all required environment variables on boot before accepting traffic' },
+                  { id: 'bot-protection', label: 'Cloudflare Turnstile / Bot Shield', sub: 'Invisible CAPTCHA challenge on login, registration, and credit spend' },
+                  { id: 'audit-logging', label: 'Immutable Security Audit Logs', sub: 'Tamper-evident logs of all auth failures, role escalations, and API keys' },
+                ].map((item) => {
+                  const active = (sec.defenses || []).includes(item.id as SecurityDefense);
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => {
+                        const current = sec.defenses || [];
+                        const next = active 
+                          ? current.filter(d => d !== item.id) 
+                          : [...current, item.id as SecurityDefense];
+                        updateSecurity({ defenses: next });
+                      }}
+                      className={`w-full p-2.5 rounded-xl border text-left transition-all flex items-start gap-2.5 ${
+                        active
+                          ? 'border-emerald-500/60 bg-emerald-500/10 text-white'
+                          : 'border-neutral-800 bg-neutral-900/60 text-neutral-400 hover:border-neutral-700'
+                      }`}
+                    >
+                      <div className="mt-0.5 shrink-0">
+                        {active ? <CheckSquare className="w-4 h-4 text-emerald-400" /> : <SquareIcon className="w-4 h-4 text-neutral-600" />}
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-xs font-bold text-white">{item.label}</div>
+                        <div className="text-[10px] text-neutral-400 leading-snug">{item.sub}</div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Input Validation Engine */}
             <div>
               <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-400 mb-2 flex items-center gap-1.5">
                 <Lock className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Input Validation Schema</span>
+                <span>Input Validation Engine</span>
               </label>
               <div className="grid grid-cols-3 gap-2">
                 {[
@@ -622,10 +732,10 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ theme, onChange }) =
               </div>
             </div>
 
-            {/* Content Security Policy */}
+            {/* Content Security Policy Mode */}
             <div>
               <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-400 mb-2 block">
-                Content Security Policy (CSP)
+                Content Security Policy (CSP) Directives
               </label>
               <div className="grid grid-cols-3 gap-2">
                 {[
@@ -648,53 +758,6 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ theme, onChange }) =
               </div>
             </div>
 
-            {/* HTTP Security Headers Toggles */}
-            <div className="space-y-2.5 pt-2">
-              <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-400 block">
-                HTTP Security Headers & Protection
-              </label>
-
-              <label className="flex items-center justify-between p-3 rounded-xl border border-neutral-800 bg-neutral-900/60 cursor-pointer">
-                <div>
-                  <div className="text-xs font-semibold text-white">Strict-Transport-Security (HSTS)</div>
-                  <div className="text-[10px] text-neutral-400">Enforces HTTPS with preload directive</div>
-                </div>
-                <input
-                  type="checkbox"
-                  checked={sec.headers.hsts}
-                  onChange={(e) => updateSecurity({ headers: { ...sec.headers, hsts: e.target.checked } })}
-                  className="w-4 h-4 accent-sky-500 rounded cursor-pointer"
-                />
-              </label>
-
-              <label className="flex items-center justify-between p-3 rounded-xl border border-neutral-800 bg-neutral-900/60 cursor-pointer">
-                <div>
-                  <div className="text-xs font-semibold text-white">CSRF Defense Tokens</div>
-                  <div className="text-[10px] text-neutral-400">Verifies origin & SameSite tokens on mutations</div>
-                </div>
-                <input
-                  type="checkbox"
-                  checked={sec.csrfProtection}
-                  onChange={(e) => updateSecurity({ csrfProtection: e.target.checked })}
-                  className="w-4 h-4 accent-sky-500 rounded cursor-pointer"
-                />
-              </label>
-
-              <label className="flex items-center justify-between p-3 rounded-xl border border-neutral-800 bg-neutral-900/60 cursor-pointer">
-                <div>
-                  <div className="text-xs font-semibold text-white">Clickjacking Defense</div>
-                  <div className="text-[10px] text-neutral-400">X-Frame-Options: {sec.headers.frameOptions}</div>
-                </div>
-                <select
-                  value={sec.headers.frameOptions}
-                  onChange={(e) => updateSecurity({ headers: { ...sec.headers, frameOptions: e.target.value as any } })}
-                  className="bg-neutral-800 text-xs border border-neutral-700 rounded-lg px-2 py-1 text-white"
-                >
-                  <option value="DENY">DENY (Block all frames)</option>
-                  <option value="SAMEORIGIN">SAMEORIGIN</option>
-                </select>
-              </label>
-            </div>
           </div>
         )}
 

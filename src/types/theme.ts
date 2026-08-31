@@ -1,6 +1,29 @@
+export type AuthMethod = 
+  | 'session-cookies' 
+  | 'oauth-jwt' 
+  | 'passkeys' 
+  | 'magic-link' 
+  | 'totp-2fa' 
+  | 'supabase-auth' 
+  | 'clerk-auth';
+
+export type SecurityDefense = 
+  | 'csrf'
+  | 'hsts'
+  | 'csp'
+  | 'clickjacking'
+  | 'nosniff'
+  | 'cors-whitelist'
+  | 'zod-sanitization'
+  | 'parameterized-sql'
+  | 'env-validation'
+  | 'bot-protection'
+  | 'audit-logging';
+
 export interface SecurityConfig {
-  authStrategy: 'oauth-jwt' | 'session-cookies' | 'passkeys' | 'supabase-auth' | 'clerk-auth';
-  csrfProtection: boolean;
+  authMethods: AuthMethod[];
+  defenses: SecurityDefense[];
+  
   corsMode: 'strict-whitelist' | 'same-origin' | 'permissive';
   contentSecurityPolicy: 'strict' | 'standard' | 'relaxed';
   rateLimiting: {
@@ -16,6 +39,8 @@ export interface SecurityConfig {
     frameOptions: 'DENY' | 'SAMEORIGIN';
   };
   inputValidation: 'zod' | 'valibot' | 'typebox';
+  csrfProtection: boolean;
+  authStrategy?: string; // Optional legacy compatibility
 }
 
 export interface BackendConfig {

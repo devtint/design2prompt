@@ -1,7 +1,18 @@
 import { PresetTheme, SecurityConfig, BackendConfig } from '../types/theme';
 
 export const DEFAULT_SECURITY: SecurityConfig = {
-  authStrategy: 'session-cookies',
+  authMethods: ['session-cookies', 'oauth-jwt', 'passkeys'],
+  defenses: [
+    'csrf',
+    'hsts',
+    'csp',
+    'clickjacking',
+    'nosniff',
+    'cors-whitelist',
+    'zod-sanitization',
+    'parameterized-sql',
+    'env-validation',
+  ],
   csrfProtection: true,
   corsMode: 'strict-whitelist',
   contentSecurityPolicy: 'strict',
@@ -744,15 +755,16 @@ export const PRESET_THEMES: PresetTheme[] = RAW_PRESETS.map((preset) => {
   let backendOverride: Partial<BackendConfig> = {};
 
   if (preset.id === 'supabase') {
-    securityOverride = { authStrategy: 'supabase-auth' };
+    securityOverride = { authMethods: ['supabase-auth', 'oauth-jwt'] };
     backendOverride = { database: 'supabase', orm: 'drizzle' };
   } else if (preset.id === 'antigravity') {
-    securityOverride = { authStrategy: 'oauth-jwt', corsMode: 'strict-whitelist' };
+    securityOverride = { authMethods: ['oauth-jwt', 'passkeys'], corsMode: 'strict-whitelist' };
     backendOverride = { runtime: 'edge', apiStyle: 'trpc', caching: 'redis-upstash' };
   } else if (preset.id === 'vercel') {
+    securityOverride = { authMethods: ['session-cookies', 'oauth-jwt', 'passkeys'] };
     backendOverride = { runtime: 'edge', apiStyle: 'server-actions', hosting: 'vercel' };
   } else if (preset.id === 'claude') {
-    securityOverride = { authStrategy: 'session-cookies', contentSecurityPolicy: 'strict' };
+    securityOverride = { authMethods: ['session-cookies', 'passkeys'], contentSecurityPolicy: 'strict' };
     backendOverride = { database: 'postgresql-neon', orm: 'drizzle' };
   } else if (preset.id === 'cad-blueprint') {
     backendOverride = { runtime: 'go', orm: 'raw-sql' };

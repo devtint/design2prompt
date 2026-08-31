@@ -49,14 +49,22 @@ export function generateUniversalMarkdown(
 
   // 2. Security
   if (sections.security) {
+    const authList = (sec.authMethods && sec.authMethods.length > 0)
+      ? sec.authMethods.map(m => `\`${m}\``).join(', ')
+      : `\`${sec.authStrategy || 'session-cookies'}\``;
+
+    const defenseList = (sec.defenses && sec.defenses.length > 0)
+      ? sec.defenses.map(d => `\`${d}\``).join(', ')
+      : '`csrf`, `hsts`, `csp`, `clickjacking`, `nosniff`, `parameterized-sql`';
+
     md += `---
 
-## 2. Security & Hardening Specification (Strict)
-- **Authentication Strategy**: **${sec.authStrategy}** (HTTP-only secure cookies with \`SameSite=Lax\` or \`Strict\`)
+## 2. Security & Defense-in-Depth Specification
+- **Authentication Layers**: ${authList}
+- **Hardening & Active Defenses**: ${defenseList}
 - **Input Validation**: **${sec.inputValidation.toUpperCase()}** schema validation required on all incoming API payloads, query params, and server actions. Reject unknown properties.
-- **CSRF Defense**: ${sec.csrfProtection ? 'Enabled via origin verification & anti-CSRF tokens for all state-changing mutations.' : 'Disabled'}
 - **Cross-Origin Policy (CORS)**: **${sec.corsMode}** — only explicitly whitelisted origins are permitted. Disallow wildcard \`*\` on authenticated endpoints.
-- **Content Security Policy (CSP)**: **${sec.contentSecurityPolicy.toUpperCase()}** — disallow unsafe-inline scripts where possible, enforce HTTPS scripts and asset origins.
+- **Content Security Policy (CSP)**: **${sec.contentSecurityPolicy.toUpperCase()}** — cryptographic nonces to prevent XSS script injection.
 - **HTTP Security Headers**:
   - Strict-Transport-Security: \`max-age=31536000; includeSubDomains; preload\` (${sec.headers.hsts ? 'Active' : 'Off'})
   - X-Content-Type-Options: \`nosniff\` (${sec.headers.noSniff ? 'Active' : 'Off'})
@@ -147,9 +155,12 @@ export function generateCursorRules(
   let rules = `# .cursorrules - Project Guidelines & Rules\n\n`;
 
   if (sections.security) {
+    const authList = (sec.authMethods || [sec.authStrategy || 'session-cookies']).join(', ');
+    const defenseList = (sec.defenses || ['csrf', 'hsts', 'csp']).join(', ');
     rules += `## Security & Protection Guidelines (P0 Critical)
 - Input Validation: Validate EVERY API route, server action, or form input using ${sec.inputValidation}. Return 400 Bad Request with formatted schema errors.
-- Auth Strategy: Follow ${sec.authStrategy}. Store session credentials in HTTP-only, Secure, SameSite cookies.
+- Auth Methods: Support ${authList}. Store credentials in HTTP-only, Secure, SameSite cookies or WebAuthn credentials.
+- Defenses: Active protections include ${defenseList}.
 - Security Headers: Apply HSTS, X-Content-Type-Options: nosniff, and X-Frame-Options: ${sec.headers.frameOptions}.
 - Secrets: Never commit credentials. Read environment variables through a validated schema.\n\n`;
   }
@@ -198,8 +209,12 @@ export function generateClaudePrompt(
   let prompt = `You are a Principal Software Engineer and Security Architect.\n\nPlease build the application using the following guidelines:\n\n`;
 
   if (sections.security) {
+    const authList = (sec.authMethods || [sec.authStrategy || 'session-cookies']).join(', ');
+    const defenseList = (sec.defenses || ['csrf', 'hsts', 'csp', 'nosniff']).join(', ');
+
     prompt += `### 🛡️ Security & API Hardening:
-- Auth: ${sec.authStrategy}
+- Authentication: ${authList}
+- Active Hardening Defenses: ${defenseList}
 - Input Validation: Strict ${sec.inputValidation} schemas on all requests
 - Headers: HSTS, nosniff, X-Frame-Options: ${sec.headers.frameOptions}, CSP ${sec.contentSecurityPolicy}
 - CORS: ${sec.corsMode}\n\n`;

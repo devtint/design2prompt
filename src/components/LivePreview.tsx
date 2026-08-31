@@ -858,9 +858,17 @@ export const LivePreview: React.FC<LivePreviewProps> = ({
                   {/* Architecture Badges Grid */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2.5 text-xs">
                     <div className="p-3 border rounded-xl bg-neutral-500/5 space-y-1" style={{ borderColor: 'var(--theme-border)' }}>
-                      <div className="text-[10px] uppercase font-bold text-neutral-400">Authentication</div>
-                      <div className="font-semibold truncate">{theme.security.authStrategy}</div>
-                      <div className="text-[10px] text-emerald-400">✓ CSRF Protected</div>
+                      <div className="text-[10px] uppercase font-bold text-neutral-400">
+                        Auth Methods ({(theme.security.authMethods || []).length || 1})
+                      </div>
+                      <div className="font-semibold truncate capitalize">
+                        {(theme.security.authMethods || [theme.security.authStrategy || 'session-cookies'])
+                          .map(m => m.replace(/-/g, ' '))
+                          .join(', ')}
+                      </div>
+                      <div className="text-[10px] text-emerald-400">
+                        ✓ {(theme.security.defenses || []).length || 8} Active Defenses
+                      </div>
                     </div>
 
                     <div className="p-3 border rounded-xl bg-neutral-500/5 space-y-1" style={{ borderColor: 'var(--theme-border)' }}>
